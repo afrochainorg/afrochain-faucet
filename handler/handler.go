@@ -38,6 +38,8 @@ type RequestPayload struct {
 
 type RequestResponse struct {
 	TxHash string `json:"txhash"`
+	Code   uint32 `json:"code"`
+	RawLog string `json:"raw_log"`
 }
 
 func (h *Handler) Request(c *gin.Context) {
@@ -84,6 +86,13 @@ func (h *Handler) Request(c *gin.Context) {
 	if err := json.Unmarshal(output, &resp); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
+		})
+		return
+	}
+
+	if resp.Code != 0 {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": resp.RawLog,
 		})
 		return
 	}
