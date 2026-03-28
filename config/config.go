@@ -13,6 +13,7 @@ type Config struct {
 	ChainHome           string
 	KeyringBackend      string
 	ChainID             string
+	Fees                string
 }
 
 func (c Config) IsValid() error {
@@ -42,6 +43,10 @@ func (c Config) IsValid() error {
 	}
 	if c.ChainID == "" {
 		return fmt.Errorf("chain-id flag must not be empty")
+	}
+
+	if c.Fees == "" {
+		return fmt.Errorf("fees flag must not be empty")
 	}
 
 	return nil

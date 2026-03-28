@@ -24,6 +24,7 @@ func main() {
 	flag.StringVar(&config.ChainHome, "home", "", "example: ~/.gaiad")
 	flag.StringVar(&config.KeyringBackend, "keyring-backend", "test", "example: test")
 	flag.StringVar(&config.ChainID, "chain-id", "", "example: cosmoshub-test-1")
+	flag.StringVar(&config.Fees, "fees", "", "example: 1000uatom")
 
 	flag.Parse()
 
