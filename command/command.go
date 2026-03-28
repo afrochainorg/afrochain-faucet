@@ -24,7 +24,7 @@ func ExecuteTransfer(c config.Config, recipient, amount string) ([]byte, error) 
 	cmd.Stderr = &stderr
 
 	if err := cmd.Run(); err != nil {
-		return out.Bytes(), fmt.Errorf(fmt.Sprint(err) + ": " + stderr.String())
+		return out.Bytes(), fmt.Errorf("%s: %s", err, stderr.String())
 	}
 
 	return out.Bytes(), nil

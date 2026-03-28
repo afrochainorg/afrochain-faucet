@@ -13,7 +13,6 @@ type Config struct {
 	ChainHome           string
 	KeyringBackend      string
 	ChainID             string
-	RedisURL            string
 }
 
 func (c Config) IsValid() error {
@@ -44,10 +43,6 @@ func (c Config) IsValid() error {
 	if c.ChainID == "" {
 		return fmt.Errorf("chain-id flag must not be empty")
 	}
-
-	if c.RedisURL == "" {
-	return fmt.Errorf("redis-url flag must not be empty")
-}
 
 	return nil
 }

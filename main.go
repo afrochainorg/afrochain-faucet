@@ -24,7 +24,6 @@ func main() {
 	flag.StringVar(&config.ChainHome, "home", "", "example: ~/.gaiad")
 	flag.StringVar(&config.KeyringBackend, "keyring-backend", "test", "example: test")
 	flag.StringVar(&config.ChainID, "chain-id", "", "example: cosmoshub-test-1")
-	flag.StringVar(&config.RedisURL, "redis-url", "", "example: rediss://default:password@host:port")
 
 	flag.Parse()
 

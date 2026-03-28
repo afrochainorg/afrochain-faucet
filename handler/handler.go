@@ -20,7 +20,7 @@ type Handler struct {
 
 // New creates a new Handler with rate limiting capabilities
 func New(c config.Config) (*Handler, error) {
-	rateLimiter, err := ratelimit.New(c.RedisURL)
+	rateLimiter, err := ratelimit.New()
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize rate limiter: %w", err)
 	}

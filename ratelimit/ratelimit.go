@@ -1,58 +1,51 @@
 package ratelimit
 
 import (
-	"context"
-	"fmt"
-	"strconv"
+	"sync"
 	"time"
-
-	"github.com/redis/go-redis/v9"
 )
 
 type RateLimiter struct {
-	client *redis.Client
-	ctx    context.Context
+	mu       sync.Mutex
+	requests map[string]time.Time
 }
 
-// New creates a new rate limiter with Redis connection
-func New(redisURL string) (*RateLimiter, error) {
-	opt, err := redis.ParseURL(redisURL)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse Redis URL: %w", err)
+// New creates a new in-memory rate limiter
+func New() (*RateLimiter, error) {
+	rl := &RateLimiter{
+		requests: make(map[string]time.Time),
 	}
 
-	client := redis.NewClient(opt)
-	ctx := context.Background()
+	// Start a cleanup goroutine to remove expired entries
+	go rl.cleanup()
 
-	_, err = client.Ping(ctx).Result()
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to Redis: %w", err)
+	return rl, nil
+}
+
+func (r *RateLimiter) cleanup() {
+	ticker := time.NewTicker(1 * time.Hour)
+	for range ticker.C {
+		r.mu.Lock()
+		now := time.Now()
+		for addr, timestamp := range r.requests {
+			if now.Sub(timestamp) >= 24*time.Hour {
+				delete(r.requests, addr)
+			}
+		}
+		r.mu.Unlock()
 	}
-
-	return &RateLimiter{
-		client: client,
-		ctx:    ctx,
-	}, nil
 }
 
 // IsAllowed checks if the address can make a request (not rate limited)
 func (r *RateLimiter) IsAllowed(address string) (bool, time.Duration, error) {
-	key := fmt.Sprintf("faucet_request:%s", address)
-	
-	lastRequestTime, err := r.client.Get(r.ctx, key).Result()
-	if err == redis.Nil {
-		return true, 0, nil
-	}
-	if err != nil {
-		return false, 0, fmt.Errorf("failed to check rate limit: %w", err)
-	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
-	timestamp, err := strconv.ParseInt(lastRequestTime, 10, 64)
-	if err != nil {
+	lastRequest, exists := r.requests[address]
+	if !exists {
 		return true, 0, nil
 	}
 
-	lastRequest := time.Unix(timestamp, 0)
 	timeElapsed := time.Since(lastRequest)
 	rateLimitDuration := 24 * time.Hour
 
@@ -66,18 +59,14 @@ func (r *RateLimiter) IsAllowed(address string) (bool, time.Duration, error) {
 
 // RecordRequest records that the address made a request
 func (r *RateLimiter) RecordRequest(address string) error {
-	key := fmt.Sprintf("faucet_request:%s", address)
-	now := time.Now().Unix()
-	
-	err := r.client.Set(r.ctx, key, now, 24*time.Hour).Err()
-	if err != nil {
-		return fmt.Errorf("failed to record request: %w", err)
-	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
 
+	r.requests[address] = time.Now()
 	return nil
 }
 
-// Close the Redis connection
+// Close the rate limiter
 func (r *RateLimiter) Close() error {
-	return r.client.Close()
+	return nil
 }
