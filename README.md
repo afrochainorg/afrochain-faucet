@@ -33,14 +33,17 @@ go build -o faucet
 
 ### Required Parameters
 
-- `--port`: Server port (e.g., 9000)
-- `--cli`: Blockchain CLI binary name (e.g., afrochaind)
-- `--address`: Faucet wallet address that will send tokens
-- `--alias`: Wallet alias/name in keyring
-- `--node`: Blockchain RPC endpoint
-- `--home`: Blockchain home directory
-- `--keyring-backend`: Keyring backend type (usually "test" for testnets)
-- `--chain-id`: Blockchain network chain ID
+| Flag | Description | Example |
+|---|---|---|
+| `--port` | Server port | `9000` |
+| `--cli` | Blockchain CLI binary name | `afrochaind` |
+| `--address` | Faucet wallet address that will send tokens | `afro13sll...` |
+| `--alias` | Wallet alias/name in keyring | `alice` |
+| `--node` | Blockchain RPC endpoint | `http://localhost:26657` |
+| `--home` | Blockchain home directory | `/home/afrochain/.afrochaind-1` |
+| `--keyring-backend` | Keyring backend type | `test` |
+| `--chain-id` | Blockchain network chain ID | `afrochain-1` |
+| `--fees` | Transaction fee for each send | `1000aafro` |
 
 ## Usage
 
@@ -51,10 +54,11 @@ go build -o faucet
          --cli afrochaind \
          --address afro13sllcdsqhjektac5r6h50dvjrthm0yt6m6sfkm \
          --alias alice \
-         --node https://127.0.0.1:26657 \
+         --node http://127.0.0.1:26657 \
          --home /home/afrochain/.afrochaind-1 \
          --keyring-backend test \
-         --chain-id afrochain-1
+         --chain-id afrochain-1 \
+         --fees 1000aafro
 ```
 
 ### Request Tokens
@@ -98,6 +102,14 @@ Request tokens from the faucet.
 {
   "message": "success",
   "txHash": "ABC123DEF456..."
+}
+```
+
+**Error Response (500):**
+
+```json
+{
+  "message": "insufficient fees; got: 0aafro required: 1000aafro"
 }
 ```
 
