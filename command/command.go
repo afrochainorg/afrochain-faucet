@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/s16rv/faucet/config"
+	"github.com/afrochainorg/afrochain-faucet/config"
 )
 
 const (

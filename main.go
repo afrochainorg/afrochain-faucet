@@ -6,10 +6,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/afrochainorg/afrochain-faucet/config"
+	"github.com/afrochainorg/afrochain-faucet/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/s16rv/faucet/config"
-	"github.com/s16rv/faucet/handler"
 )
 
 func main() {
@@ -25,7 +25,6 @@ func main() {
 	flag.StringVar(&config.KeyringBackend, "keyring-backend", "test", "example: test")
 	flag.StringVar(&config.ChainID, "chain-id", "", "example: cosmoshub-test-1")
 	flag.StringVar(&config.RedisURL, "redis-url", "", "example: rediss://default:password@host:port")
-
 
 	flag.Parse()
 

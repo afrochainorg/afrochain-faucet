@@ -8,9 +8,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/s16rv/faucet/command"
-	"github.com/s16rv/faucet/config"
-	"github.com/s16rv/faucet/ratelimit"
+	"github.com/afrochainorg/afrochain-faucet/command"
+	"github.com/afrochainorg/afrochain-faucet/config"
+	"github.com/afrochainorg/afrochain-faucet/ratelimit"
 )
 
 type Handler struct {
@@ -60,9 +60,9 @@ func (h *Handler) Request(c *gin.Context) {
 	if !allowed {
 		hours := int(timeRemaining.Hours())
 		minutes := int(timeRemaining.Minutes()) % 60
-		
+
 		nextRequestTime := time.Now().Add(timeRemaining)
-		
+
 		c.JSON(http.StatusTooManyRequests, gin.H{
 			"error":           "Rate limit exceeded",
 			"message":         "You can only request tokens once per 24 hours",
